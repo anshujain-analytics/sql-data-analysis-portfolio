@@ -1,0 +1,102 @@
+Q 13 – Name the agents whose customers have the maximum outstanding amount.
+--SELECT outstanding_amt, CUSTOMER.agent_code, agent_name, cust_name from AGENTS inner JOIN CUSTOMER on AGENTS.AGENT_CODE = CUSTOMER.agent_code order by outstanding_amt DESC;
+SELECT 
+a.AGENT_NAME, 
+c.CUST_NAME, 
+c.OUTSTANDING_AMT
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+WHERE c.OUTSTANDING_AMT = (
+SELECT MAX(OUTSTANDING_AMT) FROM CUSTOMER
+);
+SELECT 
+    a.AGENT_NAME, 
+    c.CUST_NAME, 
+    c.OUTSTANDING_AMT
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+ORDER BY c.OUTSTANDING_AMT DESC
+LIMIT 1;
+
+Q 14 - Name all the agents whose customers have less than average outstanding amount.
+SELECT outstanding_amt, CUSTOMER.AGENT_CODE, agent_name, cust_name from AGENTS INNER JOIN CUSTOMER on AGENTS.AGENT_CODE = CUSTOMER.AGENT_CODE WHERE outstanding_amt < (SELECT avg(outstanding_amt) from CUSTOMER);
+SELECT DISTINCT a.AGENT_NAME
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+WHERE c.OUTSTANDING_AMT < (
+SELECT AVG(OUTSTANDING_AMT) FROM CUSTOMER
+);
+SELECT a.AGENT_NAME, c.CUST_NAME, c.OUTSTANDING_AMT
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+WHERE c.OUTSTANDING_AMT < (
+SELECT AVG(OUTSTANDING_AMT) FROM CUSTOMER
+);
+
+
+Q 15 - Find agents who have more than 2 customers.
+SELECT 
+    a.AGENT_NAME,
+    COUNT(c.CUST_ID) AS Total_Customers
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+GROUP BY a.AGENT_CODE, a.AGENT_NAME
+HAVING COUNT(c.CUST_ID) > 2;
+
+Q 16 - Find the agent whose customers have the highest total outstanding amount
+SELECT 
+a.AGENT_NAME,
+SUM(c.OUTSTANDING_AMT) AS Total_Outstanding
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+GROUP BY a.AGENT_CODE, a.AGENT_NAME
+ORDER BY Total_Outstanding DESC
+LIMIT 1;
+
+Q 17 - Find customers whose outstanding amount is higher than their country’s average.
+SELECT 
+CUST_NAME,
+CUST_COUNTRY,
+OUTSTANDING_AMT
+FROM CUSTOMER c1
+WHERE OUTSTANDING_AMT > (
+SELECT AVG(OUTSTANDING_AMT)
+FROM CUSTOMER c2
+WHERE c1.CUST_COUNTRY = c2.CUST_COUNTRY
+);
+
+Q 18 - Find the agent name whose individual customer has the highest outstanding amount.
+SELECT 
+a.AGENT_NAME,
+c.CUST_NAME,
+c.OUTSTANDING_AMT
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+WHERE c.OUTSTANDING_AMT = (
+SELECT MAX(OUTSTANDING_AMT) FROM CUSTOMER
+);
+
+Q 19 – Find agents who are handling customers from more than one city.
+SELECT 
+a.AGENT_NAME,
+COUNT(DISTINCT c.CUST_CITY) AS Total_Cities
+FROM AGENTS a
+JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+GROUP BY a.AGENT_NAME
+HAVING COUNT(DISTINCT c.CUST_CITY) > 1;
+
+Q 20 – Find agents who are not assigned to any customer.
+SELECT 
+a.AGENT_NAME
+FROM AGENTS a
+LEFT JOIN CUSTOMER c 
+ON a.AGENT_CODE = c.AGENT_CODE
+WHERE c.CUST_ID IS NULL;
